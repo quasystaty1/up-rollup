@@ -9,6 +9,8 @@ pub(crate) enum StoredValue<'a> {
     Asset(crate::assets::storage::Value<'a>),
     Address(crate::address::storage::Value<'a>),
     Text(crate::text::storage::Value),
+    ConnectOracle(crate::connect::oracle::storage::Value<'a>),
+    ConnectMarketMap(crate::connect::market_map::storage::Value<'a>),
 }
 
 impl StoredValue<'_> {

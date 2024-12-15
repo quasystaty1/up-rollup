@@ -2,6 +2,7 @@ pub mod accounts;
 pub mod address;
 pub mod assets;
 pub mod config;
+pub mod connect;
 pub mod execution_service;
 pub mod generated;
 pub mod primitive;

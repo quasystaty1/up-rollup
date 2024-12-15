@@ -109,7 +109,6 @@ impl Rollup {
         delta
             .put_account_balance(&address, &asset, balance)
             .unwrap();
-
         delta.put_block(block, 0).unwrap();
         delta.put_text(text, 0).unwrap();
         delta.put_last_text_id(0).unwrap();

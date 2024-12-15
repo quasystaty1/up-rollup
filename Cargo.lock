@@ -350,12 +350,12 @@ dependencies = [
 [[package]]
 name = "astria-core"
 version = "0.1.0"
-source = "git+https://github.com/astriaorg/astria.git#903e1f3c659479142fe17e2782033e2ec5e31769"
+source = "git+https://github.com/astriaorg/astria.git?branch=feat/oracle#a65054f7f320b6ac25f79b1d40a8d84fe1300f0f"
 dependencies = [
- "astria-core-address",
- "astria-core-consts",
- "astria-core-crypto",
- "astria-merkle",
+ "astria-core-address 0.1.0 (git+https://github.com/astriaorg/astria.git?branch=feat/oracle)",
+ "astria-core-consts 0.1.0 (git+https://github.com/astriaorg/astria.git?branch=feat/oracle)",
+ "astria-core-crypto 0.1.0 (git+https://github.com/astriaorg/astria.git?branch=feat/oracle)",
+ "astria-merkle 1.0.0 (git+https://github.com/astriaorg/astria.git?branch=feat/oracle)",
  "base64 0.21.7",
  "base64-serde 0.7.0",
  "bytes",
@@ -369,6 +369,37 @@ dependencies = [
  "penumbra-proto",
  "prost 0.12.6",
  "rand",
+ "regex",
+ "serde",
+ "sha2 0.10.8",
+ "tendermint",
+ "tendermint-proto",
+ "thiserror 1.0.69",
+ "tonic 0.10.2",
+ "tracing",
+]
+
+[[package]]
+name = "astria-core"
+version = "0.1.0"
+source = "git+https://github.com/astriaorg/astria.git#903e1f3c659479142fe17e2782033e2ec5e31769"
+dependencies = [
+ "astria-core-address 0.1.0 (git+https://github.com/astriaorg/astria.git)",
+ "astria-core-consts 0.1.0 (git+https://github.com/astriaorg/astria.git)",
+ "astria-core-crypto 0.1.0 (git+https://github.com/astriaorg/astria.git)",
+ "astria-merkle 1.0.0 (git+https://github.com/astriaorg/astria.git)",
+ "base64 0.21.7",
+ "base64-serde 0.7.0",
+ "bytes",
+ "celestia-tendermint",
+ "hex",
+ "ibc-types",
+ "indexmap 2.7.0",
+ "pbjson",
+ "pbjson-types",
+ "penumbra-ibc",
+ "penumbra-proto",
+ "prost 0.12.6",
  "serde",
  "sha2 0.10.8",
  "tendermint",
@@ -381,12 +412,27 @@ dependencies = [
 [[package]]
 name = "astria-core-address"
 version = "0.1.0"
-source = "git+https://github.com/astriaorg/astria.git#903e1f3c659479142fe17e2782033e2ec5e31769"
+source = "git+https://github.com/astriaorg/astria.git?branch=feat/oracle#a65054f7f320b6ac25f79b1d40a8d84fe1300f0f"
 dependencies = [
- "astria-core-consts",
+ "astria-core-consts 0.1.0 (git+https://github.com/astriaorg/astria.git?branch=feat/oracle)",
  "bech32 0.11.0",
  "thiserror 1.0.69",
 ]
+
+[[package]]
+name = "astria-core-address"
+version = "0.1.0"
+source = "git+https://github.com/astriaorg/astria.git#903e1f3c659479142fe17e2782033e2ec5e31769"
+dependencies = [
+ "astria-core-consts 0.1.0 (git+https://github.com/astriaorg/astria.git)",
+ "bech32 0.11.0",
+ "thiserror 1.0.69",
+]
+
+[[package]]
+name = "astria-core-consts"
+version = "0.1.0"
+source = "git+https://github.com/astriaorg/astria.git?branch=feat/oracle#a65054f7f320b6ac25f79b1d40a8d84fe1300f0f"
 
 [[package]]
 name = "astria-core-consts"
@@ -396,9 +442,23 @@ source = "git+https://github.com/astriaorg/astria.git#903e1f3c659479142fe17e2782
 [[package]]
 name = "astria-core-crypto"
 version = "0.1.0"
+source = "git+https://github.com/astriaorg/astria.git?branch=feat/oracle#a65054f7f320b6ac25f79b1d40a8d84fe1300f0f"
+dependencies = [
+ "astria-core-consts 0.1.0 (git+https://github.com/astriaorg/astria.git?branch=feat/oracle)",
+ "base64 0.21.7",
+ "ed25519-consensus",
+ "rand",
+ "sha2 0.10.8",
+ "thiserror 1.0.69",
+ "zeroize",
+]
+
+[[package]]
+name = "astria-core-crypto"
+version = "0.1.0"
 source = "git+https://github.com/astriaorg/astria.git#903e1f3c659479142fe17e2782033e2ec5e31769"
 dependencies = [
- "astria-core-consts",
+ "astria-core-consts 0.1.0 (git+https://github.com/astriaorg/astria.git)",
  "base64 0.21.7",
  "ed25519-consensus",
  "rand",
@@ -420,6 +480,14 @@ dependencies = [
 [[package]]
 name = "astria-merkle"
 version = "1.0.0"
+source = "git+https://github.com/astriaorg/astria.git?branch=feat/oracle#a65054f7f320b6ac25f79b1d40a8d84fe1300f0f"
+dependencies = [
+ "sha2 0.10.8",
+]
+
+[[package]]
+name = "astria-merkle"
+version = "1.0.0"
 source = "git+https://github.com/astriaorg/astria.git#903e1f3c659479142fe17e2782033e2ec5e31769"
 dependencies = [
  "sha2 0.10.8",
@@ -432,9 +500,9 @@ source = "git+https://github.com/astriaorg/astria.git#903e1f3c659479142fe17e2782
 dependencies = [
  "astria-build-info",
  "astria-config",
- "astria-core",
+ "astria-core 0.1.0 (git+https://github.com/astriaorg/astria.git)",
  "astria-eyre",
- "astria-merkle",
+ "astria-merkle 1.0.0 (git+https://github.com/astriaorg/astria.git)",
  "astria-telemetry",
  "async-trait",
  "base64 0.21.7",
@@ -473,7 +541,7 @@ name = "astria-sequencer-client"
 version = "0.1.0"
 source = "git+https://github.com/astriaorg/astria.git#903e1f3c659479142fe17e2782033e2ec5e31769"
 dependencies = [
- "astria-core",
+ "astria-core 0.1.0 (git+https://github.com/astriaorg/astria.git)",
  "astria-eyre",
  "async-trait",
  "futures",
@@ -2888,6 +2956,15 @@ name = "itertools"
 version = "0.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ba291022dbbd398a455acf126c1e341954079855bc60dfdda641363bd6922569"
+dependencies = [
+ "either",
+]
+
+[[package]]
+name = "itertools"
+version = "0.13.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "413ee7dfc52ee1a4949ceeb7dbc8a33f2d6c088194d9f922fb8318faf1f01186"
 dependencies = [
  "either",
 ]
@@ -5922,7 +5999,7 @@ name = "uprollup"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "astria-core",
+ "astria-core 0.1.0 (git+https://github.com/astriaorg/astria.git?branch=feat/oracle)",
  "astria-eyre",
  "astria-sequencer",
  "astria-sequencer-client",
@@ -5943,6 +6020,7 @@ dependencies = [
  "hex-literal",
  "indexmap 1.9.3",
  "insta",
+ "itertools 0.13.0",
  "pbjson-types",
  "penumbra-ibc",
  "pin-project-lite",

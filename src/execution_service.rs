@@ -6,8 +6,10 @@ use astria_core::execution::v1::Block;
 use astria_core::generated::astria::execution::v1::execution_service_server::ExecutionService;
 use astria_core::generated::astria::execution::v1::{self as execution};
 use astria_core::generated::astria::sequencerblock::v1::rollup_data::Value::{
-    Deposit, SequencedData,
+    Deposit, OracleData, SequencedData,
 };
+use astria_core::generated::connect::service::v2::oracle_client;
+use astria_core::generated::sequencerblock::v1::{OracleData as RawOracleData, Price};
 use astria_core::primitive::v1::RollupId;
 use astria_core::Protobuf as _;
 use bytes::Bytes;
@@ -100,6 +102,11 @@ impl ExecutionService for RollupExecutionService {
                 Some(value) => match value {
                     SequencedData(data) => transactions.push(data),
                     Deposit(_) => {}
+                    OracleData(oracle_data) => {
+                        for price in oracle_data.prices {
+                            todo!() // Set price in state
+                        }
+                    }
                 },
                 None => {}
             };
@@ -139,10 +146,6 @@ impl ExecutionService for RollupExecutionService {
                 };
             }
         }
-        // proccess_transactions(transactions, self.storage.clone())
-        //     .await
-        //     .unwrap();
-        // execute new block
         let new_block = astria_core::generated::astria::execution::v1::Block {
             number: block_height + 1,
             parent_block_hash: Bytes::from_static(&[69u8; 32]),

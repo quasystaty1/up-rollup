@@ -1,21 +1,26 @@
 use crate::accounts::action::execute_transfer;
-use crate::rollup::state_ext::{StateReadExt, StateWriteExt};
+use crate::connect::oracle::state_ext::StateWriteExt as _;
+use crate::rollup::state_ext::{StateReadExt as _, StateWriteExt as _};
 use crate::text::action::execute_send_text;
+use astria_core::connect::types::v2::CurrencyPair;
 use astria_core::execution::v1::Block;
 
+use astria_core::connect::oracle::v2::QuotePrice;
 use astria_core::generated::astria::execution::v1::execution_service_server::ExecutionService;
 use astria_core::generated::astria::execution::v1::{self as execution};
 use astria_core::generated::astria::sequencerblock::v1::rollup_data::Value::{
     Deposit, OracleData, SequencedData,
 };
-use astria_core::generated::connect::service::v2::oracle_client;
+use astria_core::generated::connect::service::v2::{oracle_client, QueryMarketMapRequest};
 use astria_core::generated::sequencerblock::v1::{OracleData as RawOracleData, Price};
 use astria_core::primitive::v1::RollupId;
 use astria_core::Protobuf as _;
 use bytes::Bytes;
 use cnidarium::{StateDelta, Storage};
+use core::time;
 use prost::Message as _;
 use std::sync::Arc;
+use tendermint::node::info;
 
 use tonic::{Request, Response, Status};
 use tracing::info;
@@ -96,6 +101,11 @@ impl ExecutionService for RollupExecutionService {
     ) -> Result<Response<execution::Block>, Status> {
         let request = request.into_inner();
         let timestamp = request.timestamp.unwrap();
+        let snapshot = self.storage.latest_snapshot();
+        let mut state_delta = StateDelta::new(snapshot);
+        let commitment = state_delta.get_commitment_state().await.unwrap();
+        let block_height = commitment.soft;
+        info!("soft_height: {:?}", block_height);
         let mut transactions: Vec<Bytes> = Vec::new();
         for rollup_data in request.transactions {
             match rollup_data.value {
@@ -104,7 +114,23 @@ impl ExecutionService for RollupExecutionService {
                     Deposit(_) => {}
                     OracleData(oracle_data) => {
                         for price in oracle_data.prices {
-                            todo!() // Set price in state
+                            let quote_price = QuotePrice {
+                                price: astria_core::connect::types::v2::Price::new(
+                                    price.price.unwrap().into(),
+                                ),
+                                block_timestamp: timestamp.clone(),
+                                block_height: block_height as u64,
+                            };
+                            let currency_pair =
+                                CurrencyPair::try_from_raw(price.clone().currency_pair.unwrap())
+                                    .unwrap();
+
+                            state_delta
+                                .put_price_for_currency_pair(currency_pair, quote_price)
+                                .await
+                                .unwrap();
+
+                            info!("got oracle data: {:?}", price);
                         }
                     }
                 },
@@ -112,11 +138,6 @@ impl ExecutionService for RollupExecutionService {
             };
         }
 
-        let snapshot = self.storage.latest_snapshot();
-        let mut state_delta = StateDelta::new(snapshot);
-        let commitment = state_delta.get_commitment_state().await.unwrap();
-        let block_height = commitment.soft;
-        info!("soft_height: {:?}", block_height);
         // Process transactions
         for tx in transactions {
             let raw_transaction =

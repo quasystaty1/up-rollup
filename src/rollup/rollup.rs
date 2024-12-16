@@ -1,10 +1,13 @@
 use crate::accounts::{StateReadExt as _, StateWriteExt as _};
 use crate::config::Config;
+use crate::connect::market_map::state_ext::StateReadExt as _;
+use crate::connect::oracle::state_ext::StateReadExt as _;
 use crate::generated::protocol::transaction::v1::Transaction;
 use crate::rollup::state_ext::StateWriteExt as RollupStateExt;
 use crate::snapshot::Snapshot;
 use crate::text::{StateReadExt as _, StateWriteExt as _};
 use crate::{execution_service, snapshot};
+use astria_core::connect::market_map;
 use astria_core::execution::v1::Block;
 use astria_core::generated::astria;
 use astria_core::generated::astria::composer::v1::SubmitRollupTransactionRequest;
@@ -71,9 +74,15 @@ impl Rollup {
             .and(with_storage(storage.clone()))
             .and_then(handle_get_text_from_id);
 
+        let get_prices = warp::path!("get_prices")
+            .and(warp::get())
+            .and(with_storage(storage.clone()))
+            .and_then(handle_get_prices);
+
         let routes = submit_transaction
             .or(get_account_balance)
-            .or(get_text_from_id);
+            .or(get_text_from_id)
+            .or(get_prices);
 
         println!("Rest server listening on {}", 3030);
         // Spawn the server in a separate async task so it doesn't block the main program
@@ -212,5 +221,26 @@ async fn handle_get_text_from_id(
     let delta = cnidarium::StateDelta::new(snapshot);
     let text = delta.get_text(id).await.unwrap();
     let response = String::from(text);
+    return Ok(warp::reply::json(&response));
+}
+
+async fn handle_get_prices(storage: Storage) -> Result<impl warp::Reply, warp::Rejection> {
+    let snapshot = storage.latest_snapshot();
+    let delta = cnidarium::StateDelta::new(snapshot);
+    let mut currency_pairs_state = Vec::new();
+    let btc_currency_pair =
+        astria_core::connect::types::v2::CurrencyPair::from_str("BTC/USD").unwrap();
+    let eth_currency_pair =
+        astria_core::connect::types::v2::CurrencyPair::from_str("ETH/USD").unwrap();
+    let currecnies = vec![btc_currency_pair, eth_currency_pair];
+    for currency_pair in currecnies {
+        let curreny_state = delta
+            .get_currency_pair_state(&currency_pair)
+            .await
+            .unwrap()
+            .unwrap();
+        currency_pairs_state.push(curreny_state);
+    }
+    let response = String::from(format!("{currency_pairs_state:?}"));
     return Ok(warp::reply::json(&response));
 }
